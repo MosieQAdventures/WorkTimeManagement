@@ -4,12 +4,13 @@
     "slug": "WorkTime",
     "version": "1.0.0",
     "orientation": "portrait",
+    "backgroundColor": "#F44336",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
