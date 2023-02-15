@@ -89,7 +89,7 @@ export default function EditWorkDay({route, navigation}) {
     //console.log(changedDate.toString())
   };
 
-  // -------------------------------------
+  // ------------------------------------------
 
   useLayoutEffect(() => {
     navigation.setOptions({
