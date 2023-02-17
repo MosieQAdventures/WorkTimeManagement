@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
     flex:1,
     padding: 4,
     marginVertical: 6,
+    marginHorizontal: 10,
     backgroundColor: GlobalStyles.colors.red400,
     flexDirection: 'row',
     justifyContent: 'space-between',

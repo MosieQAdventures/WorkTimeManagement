@@ -25,7 +25,8 @@ export default function MonthWorkDays() {
     <WorkDaysOutput 
     workdays={monthItems} 
     workdaysPeriod="TOTAL - THIS MONTH" 
-    fallbackText="Register your first item with (+) button in topbar." />
+    fallbackText="Register your first item with (+) button in topbar."
+    isMonthView={true} />
   )
 }
 

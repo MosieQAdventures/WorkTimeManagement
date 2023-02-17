@@ -9,7 +9,8 @@ export default function AllWorkDays() {
     <WorkDaysOutput 
     workdays={ctx.items} 
     workdaysPeriod="TOTAL - SUMMARY" 
-    fallbackText="No registered items found." />
+    fallbackText="No registered items found."
+    isMonthView={false} />
   )
 }
 

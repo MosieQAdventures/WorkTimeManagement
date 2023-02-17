@@ -15,5 +15,9 @@ export const GlobalStyles = {
     red200A: '#FF5252',
     red400A: '#FF1744',
     red700A: '#D50000',
+
+    grey300: '#E0E0E0',
+    grey700: '#616161',
+    grey800: '#424242',
   }
 }

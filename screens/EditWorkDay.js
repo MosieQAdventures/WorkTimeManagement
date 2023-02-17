@@ -7,6 +7,8 @@ import IconButton from '../components/IconButton';
 import { GlobalStyles } from '../constants/styles';
 import { ItemsContext } from '../store/items-context';
 import { getFormattedDateDDMM, getFormattedTime, getMMDDfromDDMM, getTimeBetweenDates } from '../util.js/date';
+import { saveItemToAS, getItemFromAS, clearItemsFromAS } from '../store/async-storage';
+
 
 export default function EditWorkDay({route, navigation}) {
   const ctx = useContext(ItemsContext);
@@ -184,6 +186,7 @@ export default function EditWorkDay({route, navigation}) {
           description: "custom notatki",
         },
       );
+      //saveItemToAS()
     }
     navigation.goBack();
   }

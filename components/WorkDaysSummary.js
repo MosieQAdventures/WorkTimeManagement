@@ -38,7 +38,8 @@ const styles = StyleSheet.create({
   outerBorder: {
     borderWidth: 4,
     borderRadius: 8,
-    marginBottom: 4,
+    marginBottom: 6,
+    marginHorizontal: 10,
     borderColor: GlobalStyles.colors.red50,
   },
   period: {
