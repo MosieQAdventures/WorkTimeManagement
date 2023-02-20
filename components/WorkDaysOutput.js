@@ -6,6 +6,8 @@ import WorkDaysList from './WorkDaysList'
 import WorkDaysSummary from './WorkDaysSummary'
 import { ItemsContext } from '../store/items-context';
 import { getMMDDfromDDMM, getFormattedDateDDMM, getFormattedTime, getTimeBetweenDates } from '../util.js/date';
+import { saveItemToAS, getItemFromAS } from '../store/async-storage';
+
 
 export default function WorkDaysOutput({ workdays, workdaysPeriod, fallbackText, isMonthView }) {
   const ctx = useContext(ItemsContext);
@@ -16,12 +18,11 @@ export default function WorkDaysOutput({ workdays, workdaysPeriod, fallbackText,
     content = <WorkDaysList workdays={workdays} />;
   }
 
-  const [isStartDisabled, setIsStartDisabled] = useState(false);
-  //const [newItemId, setNewItemId] = useState(new Date(1999, 0, 1, 0, 0, 0, 0))
-
   useLayoutEffect(() => {
     //console.log('reloading screen');
-  }, [isStartDisabled]);
+  }, [ctx.isStartDisabled]);
+
+  //const [newItemId, setNewItemId] = useState(new Date(1999, 0, 1, 0, 0, 0, 0))
 
   function startBtnHandler() {
     //console.log('start')
@@ -30,9 +31,12 @@ export default function WorkDaysOutput({ workdays, workdaysPeriod, fallbackText,
     let tempStartDate = new Date(currentYear+"-"+getMMDDfromDDMM(getFormattedDateDDMM(today))+"T"+getFormattedTime(today)+":00+01:00");
     let tempEndDate = tempStartDate;
     let tempTotal = getTimeBetweenDates(tempStartDate, tempEndDate);
+    let tempIdAsync = "idAsync_"+tempStartDate +"s"+ new Date().getSeconds() +"ms"+ new Date().getMilliseconds();
+
 
     ctx.addItem(
       {
+        idAsync: tempIdAsync,
         dateStart: tempStartDate,
         dateEnd: tempEndDate,
         total: tempTotal, //in hours
@@ -40,21 +44,44 @@ export default function WorkDaysOutput({ workdays, workdaysPeriod, fallbackText,
       },
     );
     
+    saveItemToAS(tempIdAsync, JSON.stringify({
+      idAsync: tempIdAsync,
+      dateStart: tempStartDate,
+      dateEnd: tempEndDate,
+      total: tempTotal, //in hours
+      description: "custom notatki",
+    }));
+
     //console.log(today.toString())
     //console.log(tempStartDate.toString())
-    setIsStartDisabled(!isStartDisabled);
+
+    ctx.setIsStartDisabled();
   }
-  function finishBtnHandler() {
+
+
+  function finishBtnHandler() { // need to code this
     //console.log('finish')
     const today = new Date();
     const currentYear = today.getFullYear();
     let tempEndDate = new Date(currentYear+"-"+getMMDDfromDDMM(getFormattedDateDDMM(today))+"T"+getFormattedTime(today)+":00+01:00");
 
-    const id = ctx.items[0].id
-    console.log(id);
-    ctx.updateItem(id, {dateEnd: tempEndDate, total: getTimeBetweenDates(ctx.items[0].dateStart, tempEndDate)})
+    //const id = ctx.items[0].id;
+    //console.log(ctx.items);
+    //ctx.updateItem(id, {dateEnd: tempEndDate, total: getTimeBetweenDates(ctx.items[0].dateStart, tempEndDate)})
 
-    setIsStartDisabled(!isStartDisabled);
+    // get last item from async and update
+
+    /*const lastAsyncId = ctx.items[0].idAsync; // helep
+    console.log(lastAsyncId);
+    saveItemToAS(lastAsyncId, JSON.stringify({
+      idAsync: lastAsyncId,
+      dateStart: ctx.items[0].dateStart,
+      dateEnd: tempEndDate,
+      total: getTimeBetweenDates(ctx.items[0].dateStart, tempEndDate), //in hours
+      description: "custom notatki",
+    }))*/
+
+    ctx.setIsStartDisabled();
   }
 
   return (
@@ -67,8 +94,8 @@ export default function WorkDaysOutput({ workdays, workdaysPeriod, fallbackText,
       <View style={styles.horizontalLine}></View>
       {!isMonthView ? <></> :
         (<View style={styles.buttonContainer}>
-          <CustomButton onPress={startBtnHandler} mode={isStartDisabled ? "disabled" : ''}>Start</CustomButton>
-          <CustomButton onPress={finishBtnHandler} mode={!isStartDisabled ? "disabled" : ''}>Finish</CustomButton>      
+          <CustomButton onPress={startBtnHandler} mode={ctx.isStartDisabled ? "disabled" : ''}>Start</CustomButton>
+          <CustomButton onPress={finishBtnHandler} mode={!ctx.isStartDisabled ? "disabled" : ''}>Finish</CustomButton>      
         </View>)
       }
       <View style={styles.horizontalLine}></View>

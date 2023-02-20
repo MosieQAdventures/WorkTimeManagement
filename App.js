@@ -43,6 +43,8 @@ function WorkDaysOverView() {
 }
 
 export default function App() {
+  console.log("")
+  console.log("- - start app - -")
   return (
     <>
       <StatusBar style="light" />

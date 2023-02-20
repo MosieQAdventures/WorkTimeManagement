@@ -7,13 +7,14 @@ import IconButton from '../components/IconButton';
 import { GlobalStyles } from '../constants/styles';
 import { ItemsContext } from '../store/items-context';
 import { getFormattedDateDDMM, getFormattedTime, getMMDDfromDDMM, getTimeBetweenDates } from '../util.js/date';
-import { saveItemToAS, getItemFromAS, clearItemsFromAS } from '../store/async-storage';
+import { saveItemToAS, getItemFromAS, removeItemFromAS, clearItemsFromAS } from '../store/async-storage';
 
 
 export default function EditWorkDay({route, navigation}) {
   const ctx = useContext(ItemsContext);
 
   const editedItemId = route.params?.itemId;
+  const editedItemAsyncId = route.params?.itemAsyncId;
   const isEditing = !!editedItemId;
 
   const hourStart = route.params?.hourStart;
@@ -91,7 +92,7 @@ export default function EditWorkDay({route, navigation}) {
     //console.log(changedDate.toString())
   };
 
-  // ------------------------------------------
+  // ----- DATEPICKER END ---------------------------------
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -126,6 +127,7 @@ export default function EditWorkDay({route, navigation}) {
 
   function deleteItemHandler() {
     ctx.deleteItem(editedItemId);
+    removeItemFromAS(editedItemAsyncId);
     navigation.goBack();
   }
 
@@ -133,6 +135,9 @@ export default function EditWorkDay({route, navigation}) {
     let tempStartDate = new Date(currentYear+"-"+getMMDDfromDDMM(startDatePressableValue)+"T"+startHourPressableValue+":00+01:00");
     let tempEndDate = new Date(currentYear+"-"+getMMDDfromDDMM(endDatePressableValue)+"T"+endHourPressableValue+":00+01:00");
     let tempTotal = getTimeBetweenDates(tempStartDate, tempEndDate);
+
+    let tempIdAsync = "idAsync_"+tempStartDate +"s"+ new Date().getSeconds() +"ms"+ new Date().getMilliseconds();
+    console.log(tempIdAsync)
 
     // some checks below
     if (tempTotal < 0) {
@@ -165,28 +170,69 @@ export default function EditWorkDay({route, navigation}) {
       ]);
       return;
     }
+    if (getMMDDfromDDMM(startDatePressableValue) > getMMDDfromDDMM(currentDate)) {
+      console.log('work from future error')
+      Alert.alert('Sad Error', `Error: Could not set work for the future. \n=> ${(startDatePressableValue)} -> ${(currentDate)}`, [
+        {text: 'OK', onPress: () => {
+          //console.log('OK Pressed')
+          navigation.goBack();
+        }},
+      ]);
+      return;
+    }
+    if ( 
+      ( getMMDDfromDDMM(startDatePressableValue) == getMMDDfromDDMM(currentDate) ) 
+      &&
+      ( startHourPressableValue > currentTime) 
+    ) {
+      console.log('work from future error')
+      Alert.alert('Sad Error', `Error: Could not set work for the future. \n=> ${(startHourPressableValue)} -> ${(currentTime)}`, [
+        {text: 'OK', onPress: () => {
+          //console.log('OK Pressed')
+          navigation.goBack();
+        }},
+      ]);
+      return;
+    }
 
     if (isEditing) {
       ctx.updateItem(
         editedItemId,
         {
           //dateStart: new Date("2023-03-16T08:00:00+01:00"),
+          idAsync: editedItemAsyncId,
           dateStart: tempStartDate,
           dateEnd: tempEndDate,
           total: tempTotal, //in hours
           description: "custom notatki",
         },
       );
+
+      saveItemToAS(editedItemAsyncId, JSON.stringify({
+        idAsync: editedItemAsyncId,
+        dateStart: tempStartDate,
+        dateEnd: tempEndDate,
+        total: tempTotal, //in hours
+        description: "custom notatki",
+      }))
     } else {
       ctx.addItem(
         {
+          idAsync: tempIdAsync,
           dateStart: tempStartDate,
           dateEnd: tempEndDate,
           total: tempTotal, //in hours
           description: "custom notatki",
         },
       );
-      //saveItemToAS()
+     
+      saveItemToAS(tempIdAsync, JSON.stringify({
+        idAsync: tempIdAsync,
+        dateStart: tempStartDate,
+        dateEnd: tempEndDate,
+        total: tempTotal, //in hours
+        description: "custom notatki",
+      }))
     }
     navigation.goBack();
   }

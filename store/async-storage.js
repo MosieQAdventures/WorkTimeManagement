@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { View, Text } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -30,10 +30,10 @@ export function getItemFromAS(key, setFun, isInt, isBool) {
 
           if (isInt) setFun(parseInt(item));
           else if (isBool) setFun((item === 'true'));
-          else setFun(item); // as a string
+          else setFun(oldArray => [item, ...oldArray]); // item into array at the start
 
         } else {
-        if (isBool) {/*item = true;*/}
+          if (isBool) {/*item = true;*/}
           else item = null;
           //console.log(key + ': failed to find the key or the value was null')
         }
@@ -43,14 +43,49 @@ export function getItemFromAS(key, setFun, isInt, isBool) {
   } catch (error) {
     console.log('error! failed to get data from asyncstorage: ')
     console.log(error)
+    return null;
   }
 
-  return null;
 }
 
-export async function clearItemsFromAS() {
+export function getAllKeysFromAS() {
+  getAllKeysFun = async () => {
+    let keys = []
+    try {
+      keys = await AsyncStorage.getAllKeys()
+    } catch(e) {
+      // read key error
+    }
+  
+    // disp keys retrieved to console
+    //console.log("keys: ")
+    //console.log(keys)
+    //for (let i = 0; i < keys.length; i++) console.log("K: "+keys[i]) 
+
+    return keys;
+  }
+
+  let keysTemp = getAllKeysFun();
+  
+  // clear AS if needed
+  // clearALLItemsFromAS();
+
+  return keysTemp;
+
+}
+
+export async function clearALLItemsFromAS() {
   try {
-    //await AsyncStorage.clear(); //dont use - make it for the keys if possible
+    await AsyncStorage.clear();
+  } catch (error) {
+    console.log('error! failed to remove data from asyncstorage: ')
+    console.log(error)
+  }
+}
+
+export async function removeItemFromAS(id) {
+  try {
+    await AsyncStorage.removeItem(id)
   } catch (error) {
     console.log('error! failed to remove data from asyncstorage: ')
     console.log(error)

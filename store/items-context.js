@@ -1,13 +1,16 @@
-import { createContext, useReducer } from "react";
+import { createContext, useEffect, useReducer, useState } from "react";
 import { getTimeBetweenDates } from "../util.js/date";
-import { saveItemToAS, getItemFromAS, clearItemsFromAS } from '../store/async-storage';
+import { getItemFromAS, saveItemToAS, clearItemsFromAS, getAllKeysFromAS } from '../store/async-storage';
 
 
 export const ItemsContext = createContext({
   items: [],
-  addItem: ({dateStart, dateEnd, total, description}) => {},
-  deleteItem: (id) => {},
-  updateItem: (id, {dateStart, dateEnd, total, description}) => {},
+  addItem: ({idAsync, dateStart, dateEnd, total, description}) => {},
+  deleteItem: (id, idAsync) => {},
+  updateItem: (id, {idAsync, dateStart, dateEnd, total, description}) => {},
+
+  isStartDisabled: false,
+  setIsStartDisabled: () => {},
 });
 
 function itemsReducer(state, action) {
@@ -30,7 +33,9 @@ function itemsReducer(state, action) {
 }
 
 export default function ItemsContextProvider({children}) {
-  const [itemsState, dispatch] = useReducer(itemsReducer, DUMMY_ITEMS);
+  const [fetchedItems, setFetchedItems] = useState([]);
+  const [itemsState, dispatch] = useReducer(itemsReducer, START_ITEMS);
+  const [isStartDisabled, setIsStartDisabledValue] = useState(false);
 
   function addItem(itemData) {
     dispatch({ type: 'ADD', payload: itemData });
@@ -42,44 +47,108 @@ export default function ItemsContextProvider({children}) {
     dispatch({ type: 'UPDATE', payload: {id: id, data: itemData} });
   }
 
+  useEffect(() => {
+    async function fetchData() {
+      //load from db at the start of the app (once)
+      //getItemFromAS('lastAddedItemId', setLastAddedItemId, true, false)
+      getItemFromAS('isStartDisabled', setIsStartDisabledValue, false, true)
+      
+      let keys = [];
+      try {
+        keys = await getAllKeysFromAS()
+        console.log("Keys in context: "+keys.length)
+      } catch(e) {
+        // read key error
+      }
+
+      for (let i = 0; i < keys.length; i++) {
+        if (keys[i].startsWith("idAsync")) console.log(keys[i])
+        else console.log("non idAsync key: " + console.log(keys[i]))
+        
+        try {
+          getItemFromAS(keys[i], setFetchedItems, false, false)
+        } catch(e) {
+          //error handling
+        }
+      }
+    }
+    
+    fetchData();
+  }, [])
+
+  //console.log("IS len: "+itemsState.length)
+  console.log("FI len: "+fetchedItems.length)
+
+  useEffect(() => { // for every item in db
+    if (fetchedItems[0] != undefined) {
+      let item = JSON.parse(fetchedItems[0])
+      item.dateStart = new Date(item.dateStart)
+      item.dateEnd = new Date(item.dateEnd)
+      console.log(item.dateStart)
+
+      dispatch({ type: 'ADD', payload: item });
+    }
+  }, [fetchedItems])
+
+
+
+
+  function setIsStartDisabled() {
+    let newValue = !isStartDisabled;
+    setIsStartDisabledValue(newValue);
+    saveItemToAS('isStartDisabled', newValue)
+  }
+
   const value = {
     items: itemsState,
     addItem: addItem,
     deleteItem: deleteItem,
     updateItem: updateItem,
-  }  
+
+    isStartDisabled: isStartDisabled,
+    setIsStartDisabled: setIsStartDisabled,
+  }
 
   return <ItemsContext.Provider value={value}>{children}</ItemsContext.Provider>
 }
 
-
-const DUMMY_ITEMS = [
-  {
-    id: 'date1',
+let START_ITEMS = [
+  /*{
+    id: 'dummy1',
+    idAsync: 'dummy1',
     dateStart: new Date("2023-01-11T08:00:00+01:00"),
     dateEnd: new Date("2023-01-11T15:45:00+01:00"),
     total: getTimeBetweenDates(new Date("2023-01-11T08:00:00+01:00"),new Date("2023-01-11T15:45:00+01:00")), //in hours
     description: "custom notatki",
   },
   {
-    id: 'date2',
-    dateStart: new Date("2023-02-12T08:00:00+01:00"),
-    dateEnd: new Date("2023-02-12T08:15:00+01:00"),
+    id: 'dummy2',
+    idAsync: 'dummy2',
+    dateStart: new Date("2023-02-14T08:00:00+01:00"),
+    dateEnd: new Date("2023-02-14T08:15:00+01:00"),
     total: getTimeBetweenDates(new Date("2023-02-12T08:00:00+01:00"),new Date("2023-02-12T08:15:00+01:00")), //in hours
     description: "custom notatki",
   },
-  {
-    id: 'date3',
+  /*{
+    id: 'dummy3',
+    idAsync: 'dummy3',
     dateStart: new Date("2023-02-14T08:00:00+01:00"),
     dateEnd: new Date("2023-02-14T16:00:00+01:00"),
     total: getTimeBetweenDates(new Date("2023-02-14T08:00:00+01:00"),new Date("2023-02-14T16:00:00+01:00")), //in hours
     description: "custom notatki",
   },
   {
-    id: 'date4',
+    id: 'dummy4',
+    idAsync: 'dummy4',
     dateStart: new Date("2023-02-16T08:00:00+01:00"),
     dateEnd: new Date("2023-02-16T17:15:00+01:00"),
     total: getTimeBetweenDates(new Date("2023-02-16T08:00:00+01:00"),new Date("2023-02-16T17:15:00+01:00")), //in hours
     description: "custom notatki",
-  },
+  },*/
 ];
+
+
+
+// updating data when finish clicked
+// set isStart variable in db
+// block add when isStart = true

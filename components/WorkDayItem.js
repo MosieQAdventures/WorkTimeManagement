@@ -5,12 +5,13 @@ import { GlobalStyles } from '../constants/styles'
 import { getFormattedDate, getFormattedDateDDMM, getFormattedTime } from '../util.js/date'
 import IconButton from './IconButton'
 
-export default function WorkDayItem({id, dateStart, dateEnd, total}) {
+export default function WorkDayItem({id, idAsync, dateStart, dateEnd, total}) {
 
   const navigation = useNavigation();
   function itemPressHandler() {
     navigation.navigate('EditWorkDay', {
       itemId: id,
+      itemAsyncId: idAsync,
       hourStart: getFormattedTime(dateStart),
       hourEnd: getFormattedTime(dateEnd),
       dateStart: getFormattedDateDDMM(dateStart),
