@@ -137,7 +137,7 @@ export default function EditWorkDay({route, navigation}) {
     let tempTotal = getTimeBetweenDates(tempStartDate, tempEndDate);
 
     let tempIdAsync = "idAsync_"+tempStartDate +"s"+ new Date().getSeconds() +"ms"+ new Date().getMilliseconds();
-    console.log(tempIdAsync)
+    //console.log(tempIdAsync)
 
     // some checks below
     if (tempTotal < 0) {
@@ -164,7 +164,7 @@ export default function EditWorkDay({route, navigation}) {
       console.log('multiple days work error')
       Alert.alert('Nani??', `Msg: You worked for >1 day? Impossible. \nApp can't handle that >.< \nThink about your life. \n=> ${(startDatePressableValue)} -> ${(endDatePressableValue)}`, [
         {text: 'OK', onPress: () => {
-          console.log('OK Pressed')
+          //console.log('OK Pressed')
           navigation.goBack();
         }},
       ]);

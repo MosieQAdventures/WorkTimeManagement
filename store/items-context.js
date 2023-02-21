@@ -62,8 +62,9 @@ export default function ItemsContextProvider({children}) {
       }
 
       for (let i = 0; i < keys.length; i++) {
-        if (keys[i].startsWith("idAsync")) console.log(keys[i])
-        else console.log("non idAsync key: " + console.log(keys[i]))
+        if (keys[i].startsWith("idAsync")){ //console.log(keys[i])
+        } else {//console.log("non idAsync key: " + keys[i])
+        }
         
         try {
           getItemFromAS(keys[i], setFetchedItems, false, false)
@@ -77,14 +78,14 @@ export default function ItemsContextProvider({children}) {
   }, [])
 
   //console.log("IS len: "+itemsState.length)
-  console.log("FI len: "+fetchedItems.length)
+  //console.log("FI len: "+fetchedItems.length)
 
   useEffect(() => { // for every item in db
     if (fetchedItems[0] != undefined) {
       let item = JSON.parse(fetchedItems[0])
       item.dateStart = new Date(item.dateStart)
       item.dateEnd = new Date(item.dateEnd)
-      console.log(item.dateStart)
+      //console.log(item.dateStart)
 
       dispatch({ type: 'ADD', payload: item });
     }

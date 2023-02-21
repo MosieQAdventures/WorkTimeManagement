@@ -12,7 +12,7 @@ export async function saveItemToAS(key, value) {
 
   try {
     await AsyncStorage.setItem(key, value.toString());
-    console.log("setting: " + key + ", " + value.toString())
+    //console.log("setting: " + key + ", " + value.toString())
   } catch (error) {
     console.log('error! failed to save data to asyncstorage: ')
     console.log(error)
@@ -37,7 +37,7 @@ export function getItemFromAS(key, setFun, isInt, isBool) {
           else item = null;
           //console.log(key + ': failed to find the key or the value was null')
         }
-        console.log("reading: " + key + ", " + item)
+        //console.log("reading: " + key + ", " + item)
         return item;
       })
   } catch (error) {

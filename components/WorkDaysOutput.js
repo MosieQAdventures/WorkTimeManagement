@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useContext } from 'react'
+import React, { useState, useLayoutEffect, useContext, useEffect } from 'react'
 import { View, Text, FlatList, StyleSheet } from 'react-native'
 import { GlobalStyles } from '../constants/styles';
 import CustomButton from './CustomButton';
@@ -11,12 +11,16 @@ import { saveItemToAS, getItemFromAS } from '../store/async-storage';
 
 export default function WorkDaysOutput({ workdays, workdaysPeriod, fallbackText, isMonthView }) {
   const ctx = useContext(ItemsContext);
+  const [lastItemFromDb, setLastItemFromDb] = useState({});
 
-  let content = <Text style={styles.infoText}>{fallbackText}</Text>
+  useEffect(() => {
+    if (ctx.items[0] != null && ctx.items[0].idAsync != undefined) {
+      let lastItem = ctx.items[0];
+      //console.log("I: "+lastItem.idAsync)
 
-  if (workdays.length > 0) {
-    content = <WorkDaysList workdays={workdays} />;
-  }
+      setLastItemFromDb(lastItem);
+    }
+  },[ctx.items])
 
   useLayoutEffect(() => {
     //console.log('reloading screen');
@@ -71,17 +75,26 @@ export default function WorkDaysOutput({ workdays, workdaysPeriod, fallbackText,
 
     // get last item from async and update
 
-    /*const lastAsyncId = ctx.items[0].idAsync; // helep
-    console.log(lastAsyncId);
-    saveItemToAS(lastAsyncId, JSON.stringify({
-      idAsync: lastAsyncId,
-      dateStart: ctx.items[0].dateStart,
+    // helep
+    //console.log("This: "+lastItemFromDb.idAsync);
+
+    ctx.updateItem(lastItemFromDb.id, {dateEnd: tempEndDate, total: getTimeBetweenDates(lastItemFromDb.dateStart, tempEndDate)})
+
+    saveItemToAS(lastItemFromDb.idAsync, JSON.stringify({
+      idAsync: lastItemFromDb.idAsync,
+      dateStart: lastItemFromDb.dateStart,
       dateEnd: tempEndDate,
-      total: getTimeBetweenDates(ctx.items[0].dateStart, tempEndDate), //in hours
-      description: "custom notatki",
-    }))*/
+      total: getTimeBetweenDates(lastItemFromDb.dateStart, tempEndDate), //in hours
+      description: lastItemFromDb.description,
+    }))
 
     ctx.setIsStartDisabled();
+  }
+
+  let content = <Text style={styles.infoText}>{fallbackText}</Text>
+
+  if (workdays.length > 0) {
+    content = <WorkDaysList workdays={workdays} />;
   }
 
   return (

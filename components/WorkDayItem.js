@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { } from 'react'
 import { Pressable, View, Text, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { GlobalStyles } from '../constants/styles'
@@ -8,6 +8,11 @@ import IconButton from './IconButton'
 export default function WorkDayItem({id, idAsync, dateStart, dateEnd, total}) {
 
   const navigation = useNavigation();
+
+  let isSameDate = false;
+  if (dateStart.toString() == dateEnd.toString()) isSameDate = true;
+  //console.log(isGreyBg)
+
   function itemPressHandler() {
     navigation.navigate('EditWorkDay', {
       itemId: id,
@@ -32,7 +37,7 @@ export default function WorkDayItem({id, idAsync, dateStart, dateEnd, total}) {
       onPress={itemPressHandler} 
       style={({pressed}) => pressed && styles.pressed}
     >
-      <View style={styles.workdayItem}>
+      <View style={[styles.workdayItem, isSameDate ? styles.sameDateBg : null ]}>
         <View style={{flexDirection: 'row'}}>
           <View style={styles.iconContainer}>
             <IconButton
@@ -148,5 +153,8 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.75
+  },
+  sameDateBg: {
+    backgroundColor: '#FF4081'
   }
 })
