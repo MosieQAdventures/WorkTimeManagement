@@ -4,6 +4,8 @@
 - - -
 
 <img src="https://user-images.githubusercontent.com/96893372/221718493-9a5462f6-862b-4f10-9e26-03a89b8915e8.png" width="240" height="540"> <img src="https://user-images.githubusercontent.com/96893372/221718514-8abbee9b-abed-4541-a5a1-50057ba9b12d.png" width="240" height="540"> 
+-
+<img src="https://user-images.githubusercontent.com/96893372/221719860-764b52d0-710c-448f-9f48-b71d606e8ddf.png" width="240" height="540"> <img src="https://user-images.githubusercontent.com/96893372/221719916-97275ad4-77a1-4a4f-8e7d-4ed566fe730d.png" width="240" height="540">
 
 - - -
 
@@ -16,6 +18,8 @@ Other functionalities:
 - Quick 1-click Start with current date
 - Quick 1-click Finish with current date
 - Date and Time Picker library
+
+-
 
 Example Scenario:
 
