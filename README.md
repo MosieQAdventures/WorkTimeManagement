@@ -19,8 +19,6 @@ Other functionalities:
 - Quick 1-click Finish with current date
 - Date and Time Picker library
 
--
-
 Example Scenario:
 
 - 17-03-23 07:55 - Starting work with just one "Start" button click
